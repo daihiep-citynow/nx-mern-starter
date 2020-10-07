@@ -2,7 +2,7 @@ export const environment = {
 	production: false,
 	name: 'Development',
 	database: {
-		uri: 'mongodb://localhost:27017/nx-mern-starter',
+		uri: 'mongodb://localhost:27017/todos',
 		options: {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,

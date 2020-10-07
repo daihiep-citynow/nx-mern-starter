@@ -141,6 +141,11 @@
 					"builder": "@nrwl/node:execute",
 					"options": {
 						"buildTarget": "api:build"
+					},
+					"configurations": {
+						"test": {
+							"buildTarget": "api:build:test"
+						}
 					}
 				},
 				"lint": {
