@@ -1,6 +1,6 @@
 # NxMernStarter by [Notice Everything Creative](https://noticeeverything.com)
 
-![build](https://gitlab.com/NoticeEverything/nx-mern-starter/badges/master/pipeline.svg)
+[![pipeline status](https://gitlab.com/NoticeEverything/nx-mern-starter/badges/main/pipeline.svg)](https://gitlab.com/NoticeEverything/nx-mern-starter/-/commits/main)
 
 This project was generated using [Nx](https://nx.dev).
 
