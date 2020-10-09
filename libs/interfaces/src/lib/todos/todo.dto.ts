@@ -1,9 +1,7 @@
-// @ts-ignore
 import moment from 'moment';
 import { Todo } from './todo.interface';
 
 export class TodoDto implements Todo {
-	// eslint-disable-next-line
 	_id: any;
 
 	createdAt: Date;

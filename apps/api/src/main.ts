@@ -5,7 +5,7 @@ import { environment } from './environments/environment';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as mongoose from 'mongoose';
 import { json, urlencoded } from 'body-parser';
-import * as morgan from 'morgan';
+import morgan from 'morgan';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);

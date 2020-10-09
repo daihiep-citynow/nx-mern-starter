@@ -1,11 +1,9 @@
 /**
- * Bind this to class methods. ignoreMethods should be used for any getters/
- * setters, which shouldn't be bound in this way.
+ * Bind `this` to class methods
  * @param cls
  * @param thisVar
- * @param ignoreMethods
  */
-export function bindThis(cls: any, thisVar: any, ignoreMethods: string[] = []) {
+export function bindThis(cls: any, thisVar: any) {
 	try {
 		const methods = Object.getOwnPropertyNames(cls.prototype);
 		methods
@@ -13,7 +11,8 @@ export function bindThis(cls: any, thisVar: any, ignoreMethods: string[] = []) {
 				return !/(?:constructor|componentDidMount|render)/.test(n);
 			})
 			.forEach((m) => {
-				if (!ignoreMethods.includes(m)) {
+				// Members (getters/setters) shouldn't be bound
+				if (typeof thisVar[m] === 'function') {
 					thisVar[m] = thisVar[m].bind(thisVar);
 				}
 			});

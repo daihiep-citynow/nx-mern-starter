@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { model, Model } from 'mongoose';
 import { TodoSchema } from './todo.schema';
 import { TodoDocument } from '@nx-mern-starter/interfaces';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ObjectId } from 'bson';
 
 describe('TodoService', () => {

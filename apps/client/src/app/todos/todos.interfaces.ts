@@ -6,7 +6,14 @@ export interface TodosProps {
 
 export interface TodoFormProps {
 	open: boolean;
-	onClose: (value:unknown) => void;
+	onClose: (value: TodoFormResponse) => void;
+	todo?: Todo;
+}
+
+export interface TodoFormResponse {
+	success: boolean;
+	todo?: TodoDto;
+	message?: string;
 }
 
 export interface TodoFormState {
@@ -15,8 +22,17 @@ export interface TodoFormState {
 
 export interface TodosState {
 	todos: TodoDto[];
+	todo?: TodoDto;
 	working: boolean;
-	showAddDialog: boolean;
+	showTodoForm: boolean;
+}
+
+export interface TodosListProps extends TodosProps {
+	onToggleDone(todo: TodoDto): Promise<void>;
+
+	onEdit(todo: TodoDto): Promise<void>;
+
+	onDelete(todo: TodoDto): Promise<void>;
 }
 
 export interface TodosListState {

@@ -4,25 +4,38 @@ import {
 	Dialog,
 	DialogActions,
 	DialogContent,
-	DialogContentText,
 	DialogTitle,
 	FormControl,
 	FormGroup,
 	Input,
 	InputLabel,
 } from '@material-ui/core';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+	KeyboardDatePicker,
+	MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
 import { TodoFormProps, TodoFormState } from '../todos.interfaces';
 import { bindThis } from '../../utils/object.utils';
 import moment from 'moment';
+import update from 'immutability-helper';
+import axios from 'axios';
+import { environment } from '../../../environments/environment';
+import { TodoDto } from '@nx-mern-starter/interfaces';
 
 export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 	get date() {
-		return moment().format('yyyy-MM-DD');
+		return moment().format('MM/DD/yyyy');
 	}
 
 	get formIsValid() {
 		const form = this.state.formValue;
-		return form.title && form.title.length && form.due;
+		return (
+			form.title &&
+			form.title.length &&
+			form.due &&
+			form.due.toString().length
+		);
 	}
 
 	constructor(props) {
@@ -31,11 +44,25 @@ export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 			formValue: {
 				title: '',
 				description: '',
-				due: null,
+				due: this.date,
 				done: false,
 			},
 		};
-		bindThis(TodoForm, this, ['formIsValid', 'date']);
+		bindThis(TodoForm, this);
+	}
+
+	componentDidMount() {
+		if (this.props.todo) {
+			const todo = this.props.todo;
+			this.setState({
+				formValue: {
+					title: todo.title,
+					description: todo.description,
+					due: moment(todo.due).format('MM/DD/yyyy'),
+					done: todo.done,
+				},
+			});
+		}
 	}
 
 	render() {
@@ -45,61 +72,62 @@ export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 				open={this.props.open}
 				fullWidth={true}
 			>
-				<DialogTitle>Add A Todo</DialogTitle>
+				<DialogTitle>
+					{this.props.todo ? 'Edit' : 'Add A'} Todo
+				</DialogTitle>
 				<DialogContent>
-					<DialogContentText>
-						<FormGroup>
-							<FormControl margin={'normal'}>
-								<InputLabel shrink={true} htmlFor="title">
-									Title
-								</InputLabel>
-								<Input
-									required={true}
-									value={this.state.formValue.title}
-									onChange={this.handleChange}
-									autoFocus
-									id="title"
-									type="text"
-									fullWidth
-								/>
-							</FormControl>
-							<FormControl margin={'normal'}>
-								<InputLabel shrink={true} htmlFor="description">
-									Description
-								</InputLabel>
-								<Input
-									value={this.state.formValue.description}
-									onChange={this.handleChange}
-									id="description"
-									type="text"
-									fullWidth
-								/>
-							</FormControl>
-							<FormControl margin={'normal'}>
-								<InputLabel shrink={true} htmlFor="due">
-									Due
-								</InputLabel>
-								<Input
-									required={true}
+					<FormGroup>
+						<FormControl margin={'normal'}>
+							<InputLabel htmlFor="title">Title</InputLabel>
+							<Input
+								required={true}
+								value={this.state.formValue.title}
+								onChange={this.handleChange}
+								autoFocus
+								id="title"
+								type="text"
+								fullWidth
+							/>
+						</FormControl>
+						<FormControl margin={'normal'}>
+							<InputLabel htmlFor="description">
+								Description
+							</InputLabel>
+							<Input
+								value={this.state.formValue.description}
+								onChange={this.handleChange}
+								id="description"
+								type="text"
+								fullWidth
+							/>
+						</FormControl>
+						<FormControl margin={'normal'}>
+							<MuiPickersUtilsProvider utils={DateFnsUtils}>
+								<KeyboardDatePicker
+									disableToolbar
+									variant="inline"
+									format="MM/dd/yyyy"
+									margin="normal"
+									id="due"
+									label="Due"
 									value={this.state.formValue.due}
 									onChange={this.handleChange}
-									id="due"
-									type="date"
-									defaultValue={this.date}
-									fullWidth
+									KeyboardButtonProps={{
+										'aria-label': 'change date',
+									}}
 								/>
-							</FormControl>
-						</FormGroup>
-					</DialogContentText>
+							</MuiPickersUtilsProvider>
+						</FormControl>
+					</FormGroup>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={this.handleClose}>Cancel</Button>
 					<Button
 						disabled={!this.formIsValid}
-						onClick={this.handleClose}
+						onClick={this.handleSubmit}
 						color="primary"
 					>
-						Add
+						Submit
 					</Button>
 				</DialogActions>
 			</Dialog>
@@ -107,14 +135,61 @@ export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 	}
 
 	handleChange(event) {
-		const input = event.target.getAttribute('id');
-		const state = { formValue: {} };
-		state[input] = event.target.value;
-		this.setState(state);
+		const isDate = event instanceof Date;
+		const input = isDate ? 'due' : event.target.getAttribute('id');
+		const $set = isDate ? event : event.target.value;
+		const newFormValue = {};
+		newFormValue[input] = { $set };
+		const formValue = update(this.state.formValue, newFormValue);
+		this.setState({ formValue });
+	}
+
+	handleSubmit() {
+		this.props.todo ? this.editTodo() : this.addTodo();
+	}
+
+	async addTodo() {
+		const res = await axios.post(
+			`${environment.api}/todos`,
+			this.state.formValue,
+		);
+		const data = res.data;
+		if (!data.success) {
+			return this.props.onClose({
+				success: false,
+				message: data.message,
+			});
+		}
+
+		this.props.onClose({
+			success: true,
+			todo: new TodoDto(res.data.data),
+		});
+	}
+
+	async editTodo() {
+		const res = await axios.put(
+			`${environment.api}/todos/${this.props.todo._id}`,
+			this.state.formValue,
+		);
+		const data = res.data;
+		if (!data.success) {
+			return this.props.onClose({
+				success: false,
+				message: data.message,
+			});
+		}
+
+		const todo = new TodoDto(res.data.data);
+		todo.due = moment(todo.due).format('MM/DD/yyyy');
+		this.props.onClose({
+			success: true,
+			todo,
+		});
 	}
 
 	handleClose() {
-		this.props.onClose(this.state.formValue);
+		this.props.onClose({ success: true });
 	}
 }
 

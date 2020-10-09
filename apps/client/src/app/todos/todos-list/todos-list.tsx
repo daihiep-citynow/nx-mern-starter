@@ -1,6 +1,8 @@
-import { TodosListState, TodosProps } from '../todos.interfaces';
+import { TodosListProps, TodosListState } from '../todos.interfaces';
 import {
+	Button,
 	Checkbox,
+	Icon,
 	Paper,
 	Table,
 	TableBody,
@@ -10,9 +12,15 @@ import {
 	TableRow,
 } from '@material-ui/core';
 import React, { Component } from 'react';
-import { TodoDto } from '@nx-mern-starter/interfaces';
+import { bindThis } from '../../utils/object.utils';
+import moment from 'moment';
 
-export class TodosList extends Component<TodosProps, TodosListState> {
+export class TodosList extends Component<TodosListProps, TodosListState> {
+	constructor(props) {
+		super(props);
+		bindThis(TodosList, this);
+	}
+
 	render() {
 		return (
 			<div>
@@ -28,26 +36,26 @@ export class TodosList extends Component<TodosProps, TodosListState> {
 						</TableHead>
 						<TableBody>
 							{this.props.todos.map((todo) => (
-								<TableRow key={todo._id}>
-									<TableCell
-										className={
-											todo.done
-												? 'MuiAlert-standardSuccess'
-												: todo.isDueShortly() &&
-												  !todo.done
-												? 'MuiAlert-standardWarning'
-												: todo.isOverdue() &&
-												  !todo.isDueShortly() &&
-												  !todo.done
-												? 'MuiAlert-standardError'
-												: 'MuiAlert-standardInfo'
-										}
-										component="th"
-										scope="row"
-									>
+								<TableRow
+									key={todo._id}
+									className={
+										todo.done
+											? 'success'
+											: todo.isDueShortly() && !todo.done
+											? 'warning'
+											: todo.isOverdue() &&
+											  !todo.isDueShortly() &&
+											  !todo.done
+											? 'error'
+											: 'info'
+									}
+								>
+									<TableCell component="th" scope="row">
 										<Checkbox
 											checked={todo.done}
-											onChange={this.toggleDone(todo)}
+											onChange={() =>
+												this.props.onToggleDone(todo)
+											}
 										/>
 									</TableCell>
 									<TableCell
@@ -66,10 +74,25 @@ export class TodosList extends Component<TodosProps, TodosListState> {
 											' (overdue)'}
 									</TableCell>
 									<TableCell component="th" scope="row">
-										{todo.due}
+										{moment(todo.due).format('MM/DD/yyyy')}
 									</TableCell>
 									<TableCell component="th" scope="row">
-										edit view delete
+										<Button
+											size="small"
+											onClick={() =>
+												this.props.onEdit(todo)
+											}
+										>
+											<Icon>edit</Icon>
+										</Button>
+										<Button
+											size="small"
+											onClick={() =>
+												this.props.onDelete(todo)
+											}
+										>
+											<Icon>delete</Icon>
+										</Button>
 									</TableCell>
 								</TableRow>
 							))}
@@ -78,22 +101,6 @@ export class TodosList extends Component<TodosProps, TodosListState> {
 				</TableContainer>
 			</div>
 		);
-	}
-
-	delete(todo: TodoDto) {
-		return null;
-	}
-
-	edit(todo: TodoDto) {
-		return null;
-	}
-
-	toggleDone(todo: TodoDto) {
-		return null;
-	}
-
-	view(todo: TodoDto) {
-		return null;
 	}
 }
 
