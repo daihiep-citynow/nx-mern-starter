@@ -6,7 +6,7 @@ export interface TodosProps {
 
 export interface TodoFormProps {
 	open: boolean;
-	onClose: Function;
+	onClose: (value:unknown) => void;
 }
 
 export interface TodoFormState {

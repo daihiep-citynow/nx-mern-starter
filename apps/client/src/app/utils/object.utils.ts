@@ -12,7 +12,7 @@ export function bindThis(cls: any, thisVar: any, ignoreMethods: string[] = []) {
 			.filter((n) => {
 				return !/(?:constructor|componentDidMount|render)/.test(n);
 			})
-			.map((m) => {
+			.forEach((m) => {
 				if (!ignoreMethods.includes(m)) {
 					thisVar[m] = thisVar[m].bind(thisVar);
 				}
