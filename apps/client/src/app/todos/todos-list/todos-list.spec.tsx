@@ -1,13 +1,12 @@
 import React from 'react';
 import { render, RenderResult } from '@testing-library/react';
-import Todos from './todos';
+import TodosList from './todos-list';
 
-describe('Todos', () => {
+describe('TodosList', () => {
 	let el: RenderResult;
 
 	beforeEach(() => {
-		el = render(<Todos todos={[]} />);
-		global.fetch = {} as any;
+		el = render(<TodosList todos={[]} />);
 	});
 
 	it('should render successfully', () => {

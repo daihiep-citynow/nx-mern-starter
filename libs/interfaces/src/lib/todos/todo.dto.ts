@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+// @ts-ignore
+import moment from 'moment';
 import { Todo } from './todo.interface';
 
 export class TodoDto implements Todo {

@@ -1,13 +1,12 @@
 import React from 'react';
 import { render, RenderResult } from '@testing-library/react';
-import Todos from './todos';
+import TodoForm from './todo-form';
 
-describe('Todos', () => {
+describe('TodoForm', () => {
 	let el: RenderResult;
 
 	beforeEach(() => {
-		el = render(<Todos todos={[]} />);
-		global.fetch = {} as any;
+		el = render(<TodoForm open={true} onClose={() => null} />);
 	});
 
 	it('should render successfully', () => {
