@@ -1,12 +1,12 @@
 import { TodoDocument } from '@nx-mern-starter/interfaces';
-import * as mongoose from 'mongoose';
+import { Model, model } from 'mongoose';
 import { TodoSchema } from './todo.schema';
 
 describe('TodoSchema', () => {
-	let todoModel: mongoose.Model<TodoDocument>;
+	let todoModel: Model<TodoDocument>;
 
 	beforeEach(async () => {
-		todoModel = mongoose.model('Todo', TodoSchema);
+		todoModel = model('Todo', TodoSchema);
 	});
 
 	afterEach(async () => {
@@ -22,7 +22,7 @@ describe('TodoSchema', () => {
 			name: 'todoName',
 		});
 
-		expect(todo instanceof mongoose.Model).toBe(true);
+		expect(todo instanceof Model).toBe(true);
 	});
 
 	it('fails to save an invalid document', async () => {

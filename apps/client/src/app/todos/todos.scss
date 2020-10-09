@@ -1,0 +1,40 @@
+.MuiAlert-message {
+	width: 100%;
+	text-align: center;
+}
+
+.MuiAlert-icon {
+	padding-top: 20px !important;
+}
+
+tr.success {
+	background-color: rgb(237, 247, 237);
+
+	th {
+		color: rgb(30, 70, 32);
+	}
+}
+
+tr.error {
+	background-color: rgb(253, 236, 234);
+
+	th {
+		color: rgb(97, 26, 21);
+	}
+}
+
+tr.warning {
+	background-color: rgb(255, 244, 229);
+
+	th {
+		color: rgb(102, 60, 0);
+	}
+}
+
+tr.info {
+	background-color: rgb(232, 244, 253);
+
+	th {
+		color: rgb(13, 60, 97);
+	}
+}
