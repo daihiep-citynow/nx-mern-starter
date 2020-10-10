@@ -7,7 +7,7 @@ export interface TodosProps {
 export interface TodoFormProps {
 	open: boolean;
 	onClose: (value: TodoFormResponse) => void;
-	todo?: Todo;
+	todo: Todo;
 }
 
 export interface TodoFormResponse {
@@ -25,6 +25,8 @@ export interface TodosState {
 	todo?: TodoDto;
 	working: boolean;
 	showTodoForm: boolean;
+	showSnackbar: boolean;
+	msg?: string;
 }
 
 export interface TodosListProps extends TodosProps {

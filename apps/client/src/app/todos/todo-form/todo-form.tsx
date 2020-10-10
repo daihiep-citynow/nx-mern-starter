@@ -40,28 +40,13 @@ export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 
 	constructor(props) {
 		super(props);
-		this.state = {
-			formValue: {
-				title: '',
-				description: '',
-				due: this.date,
-				done: false,
-			},
-		};
+		this.state = this.setFormValue();
 		bindThis(TodoForm, this);
 	}
 
 	componentDidMount() {
 		if (this.props.todo) {
-			const todo = this.props.todo;
-			this.setState({
-				formValue: {
-					title: todo.title,
-					description: todo.description,
-					due: moment(todo.due).format('MM/DD/yyyy'),
-					done: todo.done,
-				},
-			});
+			this.setState(this.setFormValue());
 		}
 	}
 
@@ -134,11 +119,26 @@ export class TodoForm extends Component<TodoFormProps, TodoFormState> {
 		);
 	}
 
+	setFormValue() {
+		const todo = this.props.todo;
+		return {
+			formValue: {
+				title: todo ? todo.title : '',
+				description: todo ? todo.description : '',
+				due: todo ? moment(todo.due).format('MM/DD/yyyy') : this.date,
+				done: todo ? todo.done : false,
+			},
+		};
+	}
+
 	handleChange(event) {
+		// The KeyboardDatePicker component returns a Date rather than an Event
 		const isDate = event instanceof Date;
+		// Get form element
 		const input = isDate ? 'due' : event.target.getAttribute('id');
 		const $set = isDate ? event : event.target.value;
 		const newFormValue = {};
+		// Create $spec for update
 		newFormValue[input] = { $set };
 		const formValue = update(this.state.formValue, newFormValue);
 		this.setState({ formValue });
