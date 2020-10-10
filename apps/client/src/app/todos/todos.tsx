@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import { TodoFormResponse, TodosProps, TodosState } from './todos.interfaces';
 import './todos.scss';
 import { environment } from '../../environments/environment';
-import { Button, CircularProgress, Container } from '@material-ui/core';
+import {
+	Button,
+	CircularProgress,
+	Container,
+	Snackbar,
+} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import TodosList from './todos-list/todos-list';
 import { TodoForm } from './todo-form/todo-form';
@@ -15,7 +20,12 @@ import update from 'immutability-helper';
 export class Todos extends Component<TodosProps, TodosState> {
 	constructor(props: TodosProps) {
 		super(props);
-		this.state = { todos: [], working: true, showTodoForm: false };
+		this.state = {
+			todos: [],
+			working: true,
+			showTodoForm: false,
+			showSnackbar: false,
+		};
 		bindThis(Todos, this);
 	}
 
@@ -39,16 +49,18 @@ export class Todos extends Component<TodosProps, TodosState> {
 				size="small"
 				onClick={this.showTodoForm}
 			>
-				add one
+				add {this.state.todos.length ? '' : 'one'}
 			</Button>
 		);
 
 		const noTodos = (
-			<Alert severity="warning">
-				&nbsp; No TODOS found :(
-				<br />
-				{addTodoBtn}
-			</Alert>
+			<div className="multiline">
+				<Alert severity="warning">
+					&nbsp; No TODOS found :(
+					<br />
+					{addTodoBtn}
+				</Alert>
+			</div>
 		);
 
 		const todos = this.state.todos.length && (
@@ -85,8 +97,26 @@ export class Todos extends Component<TodosProps, TodosState> {
 						onClose={this.handleClose}
 					/>
 				)}
+				{this.state.showSnackbar && (
+					<Snackbar
+						open={this.state.showSnackbar}
+						autoHideDuration={6000}
+						onClose={this.closeSnackbar}
+					>
+						<Alert onClose={this.closeSnackbar} severity="error">
+							{this.state.msg}
+						</Alert>
+					</Snackbar>
+				)}
 			</Container>
 		);
+	}
+
+	closeSnackbar() {
+		this.setState({
+			showSnackbar: false,
+			msg: undefined,
+		});
 	}
 
 	showTodoForm() {
@@ -107,14 +137,19 @@ export class Todos extends Component<TodosProps, TodosState> {
 					todos.splice(i, 1);
 					this.setState({ todos });
 				} else {
-					// TODO
-					console.error('ERR: ', res.data.message);
+					this.showError(res.data.message);
 				}
 			})
 			.catch((e) => {
-				// TODO
-				console.error('ERR: ', e.message);
+				this.showError(e.message);
 			});
+	}
+
+	showError(msg: string) {
+		this.setState({
+			showSnackbar: true,
+			msg,
+		});
 	}
 
 	addTodo(todo: TodoDto) {
@@ -157,11 +192,10 @@ export class Todos extends Component<TodosProps, TodosState> {
 	}
 
 	handleClose(value: TodoFormResponse) {
-		this.setState({ showTodoForm: false });
+		this.setState({ showTodoForm: false, todo: undefined });
 
 		if (!value.success) {
-			// TODO
-			console.error('ERR: ', value.message);
+			this.showError(value.message);
 		}
 
 		if (value.todo) {
