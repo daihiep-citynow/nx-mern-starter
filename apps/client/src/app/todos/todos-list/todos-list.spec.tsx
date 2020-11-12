@@ -6,7 +6,14 @@ describe('TodosList', () => {
 	let el: RenderResult;
 
 	beforeEach(() => {
-		el = render(<TodosList todos={[]} />);
+		el = render(
+			<TodosList
+				onToggleDone={null}
+				onDelete={null}
+				onEdit={null}
+				todos={[]}
+			/>,
+		);
 	});
 
 	it('should render successfully', () => {
